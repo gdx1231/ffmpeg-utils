@@ -1,20 +1,12 @@
 package com.gdxsoft.ffmpegUtils;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
 import net.bramp.ffmpeg.FFmpeg;
 import net.bramp.ffmpeg.FFmpegExecutor;
-import net.bramp.ffmpeg.FFmpegUtils;
 import net.bramp.ffmpeg.FFprobe;
 import net.bramp.ffmpeg.builder.FFmpegBuilder;
-import net.bramp.ffmpeg.builder.FFmpegOutputBuilder;
 import net.bramp.ffmpeg.job.FFmpegJob;
-import net.bramp.ffmpeg.probe.FFmpegFormat;
-import net.bramp.ffmpeg.probe.FFmpegProbeResult;
-import net.bramp.ffmpeg.probe.FFmpegStream;
-import net.bramp.ffmpeg.progress.Progress;
 import net.bramp.ffmpeg.progress.ProgressListener;
 
 public class VideoConvert {
@@ -136,42 +128,6 @@ public class VideoConvert {
 		return this.watermark;
 	}
 
-	public static void main(String[] args) {
-		long t0 = System.currentTimeMillis();
-
-		VideoConvert vc = new VideoConvert();
-		vc.setHwAccel("cuda");
-		vc.setCodec("h264_nvenc");
-
-		String logo = "d:/360Rec/logo.png";
-		Watermark wm = new Watermark();
-		VideoScale logoSacle = new VideoScale(122, -1);
-		wm.initRightTop(logo, 19, 19, logoSacle);
-		vc.setWatermark(wm);
-
-		String sourceFile = "d:/360Rec/a.mp4";
-		String outFile = "d:/360Rec/test.mp4";
-
-		VideoScale outVideoScale = new VideoScale(480, -1);
-
-		vc.convertTo(sourceFile, outFile, BIT_RATE_1M, outVideoScale);
-
-		// 转成 ts文件
-		String outFile1 = "d:/360Rec/test.ts";
-		Command cmdts = Commands.createCovert2TsCommand(outFile, outFile1);
-		vc.exec(cmdts, null);
-
-		// 分解为 ts 片段文件
-		File segmentsPath = new File(outFile1 + "-segments");
-		segmentsPath.mkdirs();
-		String segmentPrefix = segmentsPath.getPath() + "/segment";
-		String m3u8File = segmentsPath.getPath() + "/index.m3u8";
-		Command cmtM3u8 = Commands.createM3u8Command(outFile1, m3u8File, segmentPrefix);
-		vc.exec(cmtM3u8, null);
-
-		long t1 = System.currentTimeMillis();
-		System.out.println("done " + (t1 - t0) / 1000.0);
-
-	}
+	
 
 }
