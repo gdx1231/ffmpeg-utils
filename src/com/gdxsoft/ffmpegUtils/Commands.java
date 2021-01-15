@@ -1,12 +1,44 @@
 package com.gdxsoft.ffmpegUtils;
 
+import java.io.InputStream;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.bramp.ffmpeg.builder.FFmpegBuilder;
 import net.bramp.ffmpeg.builder.FFmpegOutputBuilder;
 
 public class Commands {
 
-	public static String PATH_FFMPEG = "e:/Guolei/ffmpeg/bin/ffmpeg.exe";
-	public static String PATH_FFPROBE = "e:/Guolei/ffmpeg/bin/ffprobe.exe";
+	public static String PATH_FFMPEG;
+	public static String PATH_FFPROBE;
+	static final Logger LOG = LoggerFactory.getLogger(Commands.class);
+	static {
+		String propName = "ffmpeg-utils.properties";
+		java.util.Properties props = new java.util.Properties();
+		InputStream in = null;
+		try {
+			in = Commands.class.getClassLoader().getResourceAsStream(propName);
+			props.load(in);
+			if (props.getProperty("PATH_FFMPEG") != null) {
+				PATH_FFMPEG = props.getProperty("PATH_FFMPEG").trim();
+			}
+			if (props.getProperty("PATH_FFPROBE") != null) {
+				PATH_FFPROBE = props.getProperty("PATH_FFPROBE").trim() + "/";
+			}
+		} catch (Exception e) {
+			LOG.error(e.getMessage());
+		} finally {
+			if (in != null) {
+				try {
+					in.close();
+				} catch (Exception e) {
+					LOG.error(e.getMessage());
+				}
+			}
+		}
+
+	}
 
 	/**
 	 * 创建 转码m3u8 视频格式文件
@@ -20,11 +52,11 @@ public class Commands {
 
 		FFmpegBuilder builder3 = new FFmpegBuilder();
 		builder3.addInput(sourceFile);
-		
+
 		FFmpegOutputBuilder out3 = builder3.addOutput(segmentPrefix + "-%010d.ts");
 		out3.setVideoCodec("copy");
 		out3.setAudioCodec("copy");
-		
+
 		out3.addExtraArgs("-map", "0", "-f", "segment", "-segment_list", m3u8IndexName, "-segment_time", "7");
 
 		Command cmd = new Command();

@@ -10,7 +10,7 @@ public class test {
 		//vc.setHwAccel("cuda");
 		//vc.setCodec("h264_nvenc");
 		vc.setHwAccel("d3d11va");
-		vc.setCodec("libx264");
+		vc.setCodec("h264_nvenc");
 
 		String logo = "d:/360Rec/logo.png";
 		Watermark wm = new Watermark();
