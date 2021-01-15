@@ -1,4 +1,4 @@
-package cn.gezz.videosConvert;
+package com.gdxsoft.ffmpegUtils;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;

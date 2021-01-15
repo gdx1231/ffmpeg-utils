@@ -1,4 +1,4 @@
-package cn.gezz.videosConvert;
+package com.gdxsoft.ffmpegUtils;
 
 import java.io.File;
 import java.io.IOException;

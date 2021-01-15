@@ -1,4 +1,4 @@
-package cn.gezz.videosConvert;
+package com.gdxsoft.ffmpegUtils;
 
 import net.bramp.ffmpeg.builder.FFmpegBuilder;
 import net.bramp.ffmpeg.builder.FFmpegOutputBuilder;

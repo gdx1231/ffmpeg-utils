@@ -1,4 +1,4 @@
-package cn.gezz.videosConvert;
+package com.gdxsoft.ffmpegUtils;
 
 /**
  * 视频添加的单个水印
