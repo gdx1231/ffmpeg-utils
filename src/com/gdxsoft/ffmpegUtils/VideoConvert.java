@@ -1,15 +1,26 @@
 package com.gdxsoft.ffmpegUtils;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.bramp.ffmpeg.FFmpeg;
 import net.bramp.ffmpeg.FFmpegExecutor;
 import net.bramp.ffmpeg.FFprobe;
 import net.bramp.ffmpeg.builder.FFmpegBuilder;
 import net.bramp.ffmpeg.job.FFmpegJob;
+import net.bramp.ffmpeg.probe.FFmpegFormat;
+import net.bramp.ffmpeg.probe.FFmpegProbeResult;
+import net.bramp.ffmpeg.probe.FFmpegStream;
+import net.bramp.ffmpeg.probe.FFmpegStream.CodecType;
 import net.bramp.ffmpeg.progress.ProgressListener;
 
 public class VideoConvert {
+	static final Logger LOG = LoggerFactory.getLogger(VideoConvert.class);
+
 	public final static long BIT_RATE_500K = 500 * 1024L;
 	public final static long BIT_RATE_1M = 2 * BIT_RATE_500K;
 	public final static long BIT_RATE_2M = 2 * BIT_RATE_1M;
@@ -17,16 +28,32 @@ public class VideoConvert {
 
 	private FFmpeg ffmpeg;
 	private FFprobe ffprobe;
-	private String codec = "h264";
+	private String videoEncoder;
+	private String videoDecoder;
 	private String hwAccel;
 
 	private Watermark watermark;
 
+	/**
+	 * 初始化类<br>
+	 * 通过 ffmpeg-utils.properties的PATH_FFMPEG和PATH_FFPROBE 定义， 创建 ffmpeg 和 ffprobe对象
+	 */
 	public VideoConvert() {
+		this(Commands.PATH_FFMPEG, Commands.PATH_FFPROBE);
+	}
+
+	/**
+	 * 初始化类
+	 * 
+	 * @param pathFfmpeg  ffmpeg 执行文件目录和文件名 ，例如 c:/ffmpeg/bin/ffmpeg.exe
+	 * @param pathFfprobe ffprobe 执行文件目录和文件名 ，例如 c:/ffmpeg/bin/ffprobe.exe
+	 */
+	public VideoConvert(String pathFfmpeg, String pathFfprobe) {
 		try {
-			ffmpeg = new FFmpeg("e:/Guolei/ffmpeg/bin/ffmpeg.exe");
-			ffprobe = new FFprobe("e:/Guolei/ffmpeg/bin/ffprobe.exe");
+			ffmpeg = new FFmpeg(pathFfmpeg);
+			ffprobe = new FFprobe(pathFfprobe);
 		} catch (IOException e) {
+			LOG.error(e.getMessage());
 		}
 	}
 
@@ -41,9 +68,34 @@ public class VideoConvert {
 		this.exec(cmd.getBuilder(), listener);
 	}
 
-	public void convertTo(String sourceVideo, String outputVideo, long bitRate, VideoScale outVideoScale) {
+	/**
+	 * 转换视频
+	 * 
+	 * @param sourceVideoFile
+	 * @param outputVideoFile
+	 * @param bitRate
+	 * @param outVideoScale
+	 */
+	public void convertTo(File sourceVideoFile, File outputVideoFile, long bitRate, VideoScale outVideoScale) {
+		this.convertTo(sourceVideoFile.getAbsolutePath(), outputVideoFile.getAbsolutePath(), bitRate, outVideoScale);
+	}
 
-		Command cmd = Commands.createConvert2Mp4(sourceVideo, outputVideo, codec, bitRate, outVideoScale,
+	/**
+	 * 转换视频
+	 * 
+	 * @param sourceVideo
+	 * @param outputVideo
+	 * @param bitRate
+	 * @param outVideoScale
+	 */
+	public void convertTo(String sourceVideo, String outputVideo, long bitRate, VideoScale outVideoScale) {
+		String videoCodec = this.videoDecoder;
+
+		if (videoCodec == null || videoCodec.trim().length() == 0) {
+			videoCodec = "libx264";
+		}
+
+		Command cmd = Commands.createConvert2Mp4(sourceVideo, outputVideo, this.videoEncoder, bitRate, outVideoScale,
 				getWatermark());
 
 		if (this.hwAccel != null && this.hwAccel.trim().length() > 0) {
@@ -53,39 +105,39 @@ public class VideoConvert {
 		this.exec(cmd, null);
 	}
 
-	public void convert() {
+	/**
+	 * 获取视频基础信息
+	 * 
+	 * @param sourceVideo
+	 * @return
+	 */
+	public VideoInfo queryVodInfo(String sourceVideo) {
+		VideoInfo vi = new VideoInfo();
+		FFmpegProbeResult probeResult;
+		try {
 
-		String sourceFile = "d:/360Rec/a.mp4";
-		String outFile = "d:/360Rec/test.mp4";
-		String outFile1 = "d:/360Rec/test.ts";
-		String outFile2 = "d:/360Rec/test.m3u8";
+			probeResult = ffprobe.probe(sourceVideo);
+			FFmpegFormat format = probeResult.getFormat();
 
-		VideoScale outVideoScale = new VideoScale(480, -1);
+			List<FFmpegStream> streams = probeResult.getStreams();
+			for (int i = 0; i < streams.size(); i++) {
+				FFmpegStream stream = probeResult.getStreams().get(i);
+				if (CodecType.AUDIO == stream.codec_type) {
+					vi.setAudioStream(stream); // 音频
+				} else if (CodecType.VIDEO == stream.codec_type) {
+					vi.setVideoStream(stream); // 视频
+				} else {
+					LOG.warn("纳尼？");
+				}
+			}
 
-		long t0 = System.currentTimeMillis();
-
-		Watermark logoWateMark = this.getWatermark();
-
-		Command cmd = Commands.createConvert2Mp4(sourceFile, outFile, codec, BIT_RATE_500K, outVideoScale,
-				logoWateMark);
-
-		if (this.hwAccel != null && this.hwAccel.trim().length() > 0) {
-			cmd.getBuilder().addExtraArgs("-hwaccel", this.hwAccel);
+			vi.setFormat(format);
+			vi.setVideoPath(sourceVideo);
+			return vi;
+		} catch (IOException e) {
+			LOG.error(e.getMessage());
+			return null;
 		}
-		cmd.getLastOutputBuilder().setVideoCodec(this.codec);
-		this.exec(cmd, null);
-
-		// 转成 ts文件
-		Command cmdts = Commands.createCovert2TsCommand(outFile, outFile1);
-		this.exec(cmdts, null);
-
-		// 分解为 ts 片段文件
-		Command cmtM3u8 = Commands.createM3u8Command(outFile1, outFile2, "d:/360Rec/test");
-		this.exec(cmtM3u8, null);
-
-		long t1 = System.currentTimeMillis();
-		System.out.println("done " + (t1 - t0) / 1000.0);
-
 	}
 
 	/**
@@ -105,15 +157,15 @@ public class VideoConvert {
 	/**
 	 * @return the codec
 	 */
-	public String getCodec() {
-		return codec;
+	public String getVideoEncoder() {
+		return videoEncoder;
 	}
 
 	/**
 	 * @param codec the codec to set
 	 */
-	public void setCodec(String codec) {
-		this.codec = codec;
+	public void setVideoEncodeCodec(String videoEncoder) {
+		this.videoEncoder = videoEncoder;
 	}
 
 	/**
@@ -128,6 +180,19 @@ public class VideoConvert {
 		return this.watermark;
 	}
 
-	
+	/**
+	 * 
+	 * @return the videoDecoder
+	 */
+	public String getVideoDecoder() {
+		return videoDecoder;
+	}
+
+	/**
+	 * @param videoDecoder the videoDecoder to set
+	 */
+	public void setVideoDecoder(String videoDecoder) {
+		this.videoDecoder = videoDecoder;
+	}
 
 }

@@ -1,5 +1,6 @@
 package com.gdxsoft.ffmpegUtils;
 
+import java.io.File;
 import java.io.InputStream;
 
 import org.slf4j.Logger;
@@ -10,8 +11,23 @@ import net.bramp.ffmpeg.builder.FFmpegOutputBuilder;
 
 public class Commands {
 
+	/**
+	 * ffmpeg 执行文件目录和文件名 ，例如 c:/ffmpeg/bin/ffmpeg.exe
+	 */
 	public static String PATH_FFMPEG;
+	/**
+	 * ffprobe 执行文件目录和文件名 ，例如 c:/ffmpeg/bin/ffprobe.exe
+	 */
 	public static String PATH_FFPROBE;
+	/**
+	 * 启用的硬件加速方式，例如 cuvid
+	 */
+	public static String HWACCEL;
+	/**
+	 * 启用的硬件加速的h264编码方式，例如 h264_nvenc
+	 */
+	public static String HW_H264_ENC;
+
 	static final Logger LOG = LoggerFactory.getLogger(Commands.class);
 	static {
 		String propName = "ffmpeg-utils.properties";
@@ -24,8 +40,15 @@ public class Commands {
 				PATH_FFMPEG = props.getProperty("PATH_FFMPEG").trim();
 			}
 			if (props.getProperty("PATH_FFPROBE") != null) {
-				PATH_FFPROBE = props.getProperty("PATH_FFPROBE").trim() + "/";
+				PATH_FFPROBE = props.getProperty("PATH_FFPROBE").trim();
 			}
+			if (props.getProperty("HWACCEL") != null) {
+				HWACCEL = props.getProperty("HWACCEL").trim();
+			}
+			if (props.getProperty("HW_H264_ENC") != null) {
+				HW_H264_ENC = props.getProperty("HW_H264_ENC").trim();
+			}
+
 		} catch (Exception e) {
 			LOG.error(e.getMessage());
 		} finally {
@@ -41,7 +64,7 @@ public class Commands {
 	}
 
 	/**
-	 * 创建 转码m3u8 视频格式文件
+	 * 创建 转码m3u8 视频格式文件，按照每5秒分割一个
 	 * 
 	 * @param sourceFile    来源文件
 	 * @param m3u8IndexName m3u8索引文件 (含输出目录）
@@ -49,6 +72,20 @@ public class Commands {
 	 * @return
 	 */
 	public static Command createM3u8Command(String sourceFile, String m3u8IndexName, String segmentPrefix) {
+		return createM3u8Command(sourceFile, m3u8IndexName, segmentPrefix, 5);
+	}
+
+	/**
+	 * 创建 转码m3u8 视频格式文件
+	 * 
+	 * @param sourceFile    来源文件
+	 * @param m3u8IndexName m3u8索引文件 (含输出目录）
+	 * @param segmentPrefix 分片文件前缀 (含输出目录）
+	 * @param segmentTime   分割的时间（秒）
+	 * @return
+	 */
+	public static Command createM3u8Command(String sourceFile, String m3u8IndexName, String segmentPrefix,
+			int segmentTime) {
 
 		FFmpegBuilder builder3 = new FFmpegBuilder();
 		builder3.addInput(sourceFile);
@@ -57,7 +94,8 @@ public class Commands {
 		out3.setVideoCodec("copy");
 		out3.setAudioCodec("copy");
 
-		out3.addExtraArgs("-map", "0", "-f", "segment", "-segment_list", m3u8IndexName, "-segment_time", "7");
+		out3.addExtraArgs("-map", "0", "-f", "segment", "-segment_list", m3u8IndexName, "-segment_time",
+				String.valueOf(segmentTime));
 
 		Command cmd = new Command();
 		cmd.addOutputBuilder(out3);
@@ -69,13 +107,24 @@ public class Commands {
 	/**
 	 * 转换为ts文件
 	 * 
-	 * @param sourceFile
-	 * @param tsFileName
+	 * @param sourceFile 视频源文件
+	 * @param tsFile     输出ts视频文件
 	 * @return
 	 */
-	public static Command createCovert2TsCommand(String sourceFile, String tsFileName) {
+	public static Command createCovert2TsCommand(File sourceFile, File tsFile) {
+		return createCovert2TsCommand(sourceFile.getAbsolutePath(), tsFile.getAbsolutePath());
+	}
+
+	/**
+	 * 转换为ts文件
+	 * 
+	 * @param sourceFileName 视频源，文件目录及文件名
+	 * @param tsFileName     输出ts视频，文件目录及文件名
+	 * @return
+	 */
+	public static Command createCovert2TsCommand(String sourceFileName, String tsFileName) {
 		FFmpegBuilder builder1 = new FFmpegBuilder();
-		builder1.addInput(sourceFile);
+		builder1.addInput(sourceFileName);
 		FFmpegOutputBuilder out2 = builder1.addOutput(tsFileName);
 
 		out2.setVideoCodec("copy");

@@ -7,10 +7,11 @@ public class test {
 		long t0 = System.currentTimeMillis();
 
 		VideoConvert vc = new VideoConvert();
-		//vc.setHwAccel("cuda");
-		//vc.setCodec("h264_nvenc");
-		vc.setHwAccel("d3d11va");
-		vc.setCodec("h264_nvenc");
+		// vc.setHwAccel("cuda");
+		// vc.setCodec("h264_nvenc");
+		
+		vc.setHwAccel(Commands.HWACCEL);
+		vc.setVideoEncodeCodec(Commands.HW_H264_ENC);
 
 		String logo = "d:/360Rec/logo.png";
 		Watermark wm = new Watermark();

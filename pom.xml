@@ -4,10 +4,44 @@
 	<groupId>com.gdxsoft.ffmpeg</groupId>
 	<artifactId>ffmpeg-utils</artifactId>
 	<version>1.0.0</version>
+	<developers>
+		<developer>
+			<id>guolei</id>
+			<name>郭磊</name>
+			<url>www.gdxsoft.com</url>
+			<email>guolei@gdxsoft.com</email>
+		</developer>
+	</developers>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
+	<repositories>
+		<repository>
+			<id>public</id>
+			<name>public</name>
+			<url>https://maven.aliyun.com/repository/public</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>gradle</id>
+			<name>gradle</name>
+			<url>https://maven.aliyun.com/repository/gradle-plugin</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
 		<plugins>
