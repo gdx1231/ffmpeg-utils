@@ -168,17 +168,12 @@ public class Commands {
 		// .setStrict(FFmpegBuilder.Strict.EXPERIMENTAL) // Allow FFmpeg to use
 		// experimental specs
 		out1.setVideoBitRate(videoBitRate);
+		
+		//避免错误 Too many packets buffered for output stream 0:1
+		out1.addExtraArgs("-max_muxing_queue_size", "9999");
+		
 		out1.done();
 
-		// FFmpegOutputBuilder out2 = builder.addOutput(outFile1);
-		// out2.disableSubtitle(); // No subtiles
-		// out2.setVideoCodec("h264_nvenc"); // Video using x264
-		// out2.setVideoBitRate(1204 * 1024);
-		// out2.done();
-
-		// builder.addExtraArgs("-hwaccel", "cuda");
-		// builder.setComplexFilter(
-		// "\"[1:v]scale=100:-1[logo];[0:v][logo]overlay=main_w-overlay_w-10:10\"");
 
 		if (waterMark != null) {
 			waterMark.setVideoScale(outVideoScale);
