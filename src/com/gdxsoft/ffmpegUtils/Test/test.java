@@ -1,6 +1,8 @@
-package com.gdxsoft.ffmpegUtils;
+package com.gdxsoft.ffmpegUtils.Test;
 
 import java.io.File;
+
+import com.gdxsoft.ffmpegUtils.*;
 
 public class test {
 	public static void main(String[] args) {
@@ -9,7 +11,7 @@ public class test {
 		VideoConvert vc = new VideoConvert();
 		// vc.setHwAccel("cuda");
 		// vc.setCodec("h264_nvenc");
-		
+
 		vc.setHwAccel(Commands.HWACCEL);
 		vc.setVideoEncodeCodec(Commands.HW_H264_ENC);
 
