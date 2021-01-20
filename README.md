@@ -1,6 +1,6 @@
 # ffmpeg-utils
 
-# windows 破解 nvdia 转码并发超过两个， OpenEncodeSessionEx failed: out of memory (10)
+### windows 破解 nvdia 转码并发超过两个， OpenEncodeSessionEx failed: out of memory (10)
  ``` 
  参考：http://www.smartplatform.top/index.php/archives/84/ 
  在linux下
