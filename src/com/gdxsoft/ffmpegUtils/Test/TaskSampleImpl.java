@@ -1,7 +1,11 @@
-package com.gdxsoft.ffmpegUtils.job;
+package com.gdxsoft.ffmpegUtils.Test;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.gdxsoft.ffmpegUtils.job.ITaskInfo;
+import com.gdxsoft.ffmpegUtils.job.JobWorker;
+import com.gdxsoft.ffmpegUtils.job.TaskBasic;
 
 /**
  * 示例任务对象

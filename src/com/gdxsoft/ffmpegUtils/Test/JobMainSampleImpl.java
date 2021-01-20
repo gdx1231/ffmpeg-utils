@@ -1,4 +1,4 @@
-package com.gdxsoft.ffmpegUtils.job;
+package com.gdxsoft.ffmpegUtils.Test;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -12,6 +12,9 @@ import java.util.concurrent.TimeUnit;
 import com.gdxsoft.ffmpegUtils.VideoConvert;
 import com.gdxsoft.ffmpegUtils.VideoScale;
 import com.gdxsoft.ffmpegUtils.Watermark;
+import com.gdxsoft.ffmpegUtils.job.IJobMain;
+import com.gdxsoft.ffmpegUtils.job.ITaskInfo;
+import com.gdxsoft.ffmpegUtils.job.JobWorker;
 
 public class JobMainSampleImpl implements IJobMain {
 
@@ -111,8 +114,6 @@ public class JobMainSampleImpl implements IJobMain {
 		return wm;
 	}
 
-	 
-
 	public void initQueue(int queueLength) {
 		queues = new LinkedList<>();
 		futures = new LinkedList<>();
@@ -129,6 +130,30 @@ public class JobMainSampleImpl implements IJobMain {
 		}
 	}
 
+	public static void main(String[] args) {
+		JobMainSampleImpl boss = new JobMainSampleImpl();
+		boss.setLogoPath("d:/test/logo.png"); // logo的路径
+		boss.setSourcePath("d:/test/source"); // 源视频所在目录
+		boss.setOutputPath("d:/test/output"); // 视频输出目录
+		
+		
+		boss.queryMoreTasks();
+
+		// 根据计算机和显卡的能力，创建5个队列
+		// windows 破解 nvdia 转码并发超过两个， OpenEncodeSessionEx failed: out of memory (10)
+		// http://www.smartplatform.top/index.php/archives/84/
+		// 特征码:84 C0 74 08 C6 43 38 01 33 C0 
+		// 修改为:84 C0 90 90 C6 43 38 01 33 C0 
+		// 在linux下
+		// sed
+		// 's/\x84\xC0\x74\x08\xC6\x43\x38\x01\x33\xC0/\x84\xC0\x90\x90\xC6\x43\x38\x01\x33\xC0/g'
+		// nvcuvid.dll > nvcuvid-1.dll
+		boss.initQueue(2);
+
+		boss.executor.shutdown();
+	}
+	
+	
 	/**
 	 * @return the sourcePath
 	 */
@@ -169,24 +194,6 @@ public class JobMainSampleImpl implements IJobMain {
 	 */
 	public void setLogoPath(String logoPath) {
 		this.logoPath = logoPath;
-	}
-
-	public static void main(String[] args) {
-		JobMainSampleImpl boss = new JobMainSampleImpl();
-		boss.queryMoreTasks();
-
-		// 根据计算机和显卡的能力，创建5个队列
-		// windows 破解 nvdia 转码并发超过两个， OpenEncodeSessionEx failed: out of memory (10)
-		// http://www.smartplatform.top/index.php/archives/84/
-		// 特征码:84 C0 74 08 C6 43 38 01 33 C0 
-		// 修改为:84 C0 90 90 C6 43 38 01 33 C0 
-		// 在linux下
-		// sed
-		// 's/\x84\xC0\x74\x08\xC6\x43\x38\x01\x33\xC0/\x84\xC0\x90\x90\xC6\x43\x38\x01\x33\xC0/g'
-		// nvcuvid.dll > nvcuvid-1.dll
-		boss.initQueue(5);
-
-		boss.executor.shutdown();
 	}
 
 }
