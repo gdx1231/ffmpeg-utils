@@ -11,7 +11,7 @@ public class VideoScale {
 	/**
 	 * 720 x 480
 	 * 
-	 * @return
+	 * @return 480P
 	 */
 	public static VideoScale get480P() {
 		// 480P通常用在DVD里，额定分辨率为720*480
@@ -22,7 +22,7 @@ public class VideoScale {
 	/**
 	 * 1280 x 720
 	 * 
-	 * @return
+	 * @return 720P
 	 */
 	public static VideoScale get720P() {
 		// 720P是美国电影电视工程师协会（SMPTE）制定的高等级高清数字电视的格式标准，有效显示格式为：1280×720。
@@ -32,7 +32,7 @@ public class VideoScale {
 	/**
 	 * 1920 x 1080
 	 * 
-	 * @return
+	 * @return 1080P
 	 */
 	public static VideoScale get1080P() {
 		return new VideoScale(1920, 1080);
@@ -41,7 +41,7 @@ public class VideoScale {
 	/**
 	 * 3840 x 2160
 	 * 
-	 * @return
+	 * @return 4K
 	 */
 	public static VideoScale get4K() {
 		// 从技术上讲，“4K”意味着水平分辨率为4096像素。这是数字电影倡导联盟（Digital Cinema
@@ -53,7 +53,7 @@ public class VideoScale {
 	/**
 	 * 7680 x 4320
 	 * 
-	 * @return
+	 * @return 8K
 	 */
 	public static VideoScale get8K() {
 		/*
@@ -74,8 +74,8 @@ public class VideoScale {
 	/**
 	 * 初始化视频缩放比例
 	 * 
-	 * @param width
-	 * @param height
+	 * @param width  宽度
+	 * @param height 高度
 	 */
 	public VideoScale(int width, int height) {
 		this.setHeight(height);
@@ -83,6 +83,8 @@ public class VideoScale {
 	}
 
 	/**
+	 * 宽度
+	 * 
 	 * @return the width
 	 */
 	public int getWidth() {
@@ -90,6 +92,8 @@ public class VideoScale {
 	}
 
 	/**
+	 * 宽度
+	 * 
 	 * @param width the width to set
 	 */
 	public void setWidth(int width) {
@@ -97,6 +101,8 @@ public class VideoScale {
 	}
 
 	/**
+	 * 高度
+	 * 
 	 * @return the height
 	 */
 	public int getHeight() {
@@ -104,12 +110,17 @@ public class VideoScale {
 	}
 
 	/**
+	 * 高度
+	 * 
 	 * @param height the height to set
 	 */
 	public void setHeight(int height) {
 		this.height = height;
 	}
 
+	/**
+	 * 返回 ffmpeg 所需的命令格式
+	 */
 	public String toString() {
 		return "scale=" + this.width + ":" + this.height;
 	}

@@ -12,6 +12,12 @@ import com.gdxsoft.ffmpegUtils.VideoConvert;
 import com.gdxsoft.ffmpegUtils.VideoInfo;
 import com.gdxsoft.ffmpegUtils.VideoScale;
 
+/**
+ * 视频转换工人
+ * 
+ * @author admin
+ *
+ */
 public class JobWorker implements Callable<String> {
 	static final Logger LOG = LoggerFactory.getLogger(JobWorker.class);
 	private String workName;
@@ -19,6 +25,12 @@ public class JobWorker implements Callable<String> {
 	private VideoConvert vodCovert;
 	private ITaskInfo taskInfo;
 
+	/**
+	 * 初始化工人
+	 * 
+	 * @param workName 名称
+	 * @param jobMain  调用者boss
+	 */
 	public JobWorker(String workName, IJobMain jobMain) {
 		this.workName = workName;
 		this.jobMain = jobMain;
@@ -28,7 +40,7 @@ public class JobWorker implements Callable<String> {
 	/**
 	 * 根据ffmpeg-utils.properties的定义，初始化默认的 VideoConvert
 	 * 
-	 * @return
+	 * @return the VideoConvert
 	 */
 	public VideoConvert initDefaultVc() {
 		VideoConvert vc = new VideoConvert();
@@ -39,6 +51,9 @@ public class JobWorker implements Callable<String> {
 		return vc;
 	}
 
+	/**
+	 * 当通过 ThreadPoolExecutor加载时执行
+	 */
 	@Override
 	public String call() throws Exception {
 		LOG.info(this.workName + " start");
@@ -59,9 +74,11 @@ public class JobWorker implements Callable<String> {
 	}
 
 	/**
-	 * 根据原始视频的长宽比，获取输出视频的分辨
+	 * 根据原始视频的长宽比，获取输出视频的分辨<br>
+	 * 当source.width > source.height out.height = -1 根据视频内容自动计算高度<br>
+	 * 当source.width <= source.height out.width = -1 根据视频内容自动计算高度
 	 * 
-	 * @return
+	 * @return 输出视频的分辨
 	 */
 	private VideoScale calcOutVideoScale(VideoInfo info) {
 
@@ -82,10 +99,10 @@ public class JobWorker implements Callable<String> {
 	}
 
 	/**
-	 * 转换视频为 mp4, ts, m3u8
+	 * 按顺序转换视频为 mp4, ts, m3u8
 	 * 
 	 * @param taskInfo
-	 * @return
+	 * @return 工作结果
 	 * @throws Exception
 	 */
 	public JobResult convertToMp4TsM3u8(ITaskInfo taskInfo) throws Exception {
@@ -167,7 +184,7 @@ public class JobWorker implements Callable<String> {
 	 * 分解为 ts 片段文件
 	 * 
 	 * @param outTs
-	 * @return
+	 * @return 转换结果
 	 */
 	public ConvertResult convertToM3u8(File outTs) {
 		VideoConvert vc = this.getVodCovert();
@@ -188,7 +205,7 @@ public class JobWorker implements Callable<String> {
 	 * 转成 ts文件
 	 * 
 	 * @param outMp4
-	 * @return
+	 * @return 转换结果
 	 */
 	public ConvertResult convertToTs(File outMp4) {
 		VideoConvert vc = this.getVodCovert();
@@ -205,7 +222,7 @@ public class JobWorker implements Callable<String> {
 	/**
 	 * 转换为MP4
 	 * 
-	 * @return
+	 * @return 转换结果
 	 */
 	public ConvertResult convertToMp4() {
 		VideoConvert vc = this.getVodCovert();

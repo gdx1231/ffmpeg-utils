@@ -25,7 +25,7 @@ public class Watermark {
 	}
 
 	/**
-	 * 左上角
+	 * 左上角 "overlay=" + left + ":" + top
 	 * 
 	 * @param logoFile
 	 * @param top
@@ -46,7 +46,7 @@ public class Watermark {
 	}
 
 	/**
-	 * 右上角
+	 * 右上角 "overlay=main_w-overlay_w-" + right + ":" + top
 	 * 
 	 * @param logoFile
 	 * @param right
@@ -67,7 +67,7 @@ public class Watermark {
 	}
 
 	/**
-	 * 左下角
+	 * 左下角 "overlay=" + left + ":main_h-overlay_h-" + bottom
 	 * 
 	 * @param logoFile
 	 * @param left
@@ -87,7 +87,7 @@ public class Watermark {
 	}
 
 	/**
-	 * 右下角
+	 * 右下角 "overlay=main_w-overlay_w-" + right + ":main_h-overlay_h-" + bottom
 	 * 
 	 * @param logoFile
 	 * @param bottom
@@ -174,6 +174,8 @@ public class Watermark {
 	}
 
 	/**
+	 * 获取水印图片文件的路径
+	 * 
 	 * @return the logoFile
 	 */
 	public String getLogoFile() {
@@ -181,6 +183,8 @@ public class Watermark {
 	}
 
 	/**
+	 * 设置水印图片文件的路径
+	 * 
 	 * @param logoFile the logoFile to set
 	 */
 	public void setLogoFile(String logoFile) {
@@ -188,6 +192,8 @@ public class Watermark {
 	}
 
 	/**
+	 * 获取水印分辨率
+	 * 
 	 * @return the logoScale
 	 */
 	public VideoScale getLogoScale() {
@@ -195,6 +201,8 @@ public class Watermark {
 	}
 
 	/**
+	 * 设置水印分辨率
+	 * 
 	 * @param logoScale the logoScale to set
 	 */
 	public void setLogoScale(VideoScale logoScale) {
@@ -202,6 +210,8 @@ public class Watermark {
 	}
 
 	/**
+	 * 获取视频分辨率
+	 * 
 	 * @return the videoScale
 	 */
 	public VideoScale getVideoScale() {
@@ -209,6 +219,8 @@ public class Watermark {
 	}
 
 	/**
+	 * 设置视频分辨率
+	 * 
 	 * @param videoScale the videoScale to set
 	 */
 	public void setVideoScale(VideoScale videoScale) {
@@ -216,9 +228,9 @@ public class Watermark {
 	}
 
 	/**
-	 * logo在视频上的位置
+	 * filter_complex参数中 logo 在视频上的位置，在初始 initRightBottom等命令中自动创建
 	 * 
-	 * @return
+	 * @return filter_complex参数中 logo 在视频上的位置
 	 */
 	public String getOverlay() {
 		return this.overlay;

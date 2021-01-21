@@ -46,11 +46,14 @@ public interface ITaskInfo {
 	 * @param args
 	 */
 	void onAlreadyConverted(JobWorker work, Object[] args);
+
 	/**
 	 * 检查是否已经处理过
-	 * @return
+	 * 
+	 * @return 是否已经处理过
 	 */
 	boolean checkConverted();
+
 	/**
 	 * 来源视频地址
 	 * 
@@ -139,7 +142,7 @@ public interface ITaskInfo {
 	/**
 	 * 是否转码为 MPEG-TS 格式，默认true
 	 * 
-	 * @param covvertToTs the covvertToTs to set
+	 * @param convertToTs the convertToTs to set
 	 */
 	public void setConvertToTs(boolean convertToTs);
 

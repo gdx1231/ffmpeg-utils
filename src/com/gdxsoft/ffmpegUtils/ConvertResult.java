@@ -2,21 +2,30 @@ package com.gdxsoft.ffmpegUtils;
 
 import java.util.List;
 
+/**
+ * 执行 ffmpeg转换命令后的结果
+ * 
+ * @author admin
+ *
+ */
 public class ConvertResult {
-	private long startTime;
-	private long endTime;
-	private List<String> args;
-	private VideoInfo sourceInfo;
-	private VideoInfo outputInfo;
+	private long startTime; // 转换 开始时间
+	private long endTime; // 转换结束时间
+	private List<String> args; // ffmpeg执行的参数计划
+	private VideoInfo sourceInfo; // 来源视频信息
+	private VideoInfo outputInfo; // 输出视频信息
 
+	/**
+	 * 初始化类，记录当前时间 startTime
+	 */
 	public ConvertResult() {
 		this.startTime = System.currentTimeMillis();
 	}
 
 	/**
-	 * 执行时间
+	 * 执行时间（毫秒)
 	 * 
-	 * @return
+	 * @return 结束时间-开始时间
 	 */
 	public long execTimeMilliSeconds() {
 		return this.endTime - this.startTime;

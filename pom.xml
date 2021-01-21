@@ -1,5 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<url>https://github.com/gdx1231/ffmpeg-utils</url>
+	<description>Batch convert video to mp4, ts, m3u8 framework</description>
+	<name>FfmpegUtils</name>
+
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.gdxsoft.ffmpeg</groupId>
 	<artifactId>ffmpeg-utils</artifactId>
@@ -12,36 +16,36 @@
 			<email>guolei@gdxsoft.com</email>
 		</developer>
 	</developers>
+
+	<licenses>
+		<license>
+			<name>MIT License</name>
+			<url>https://github.com/gdx1231/ffmpeg-utils/blob/main/LICENSE</url>
+			<distribution>repo</distribution>
+			<comments>MIT license</comments>
+		</license>
+	</licenses>
+	<scm>
+		<url>https://github.com/gdx1231/ffmpeg-utils</url>
+		<connection>https://github.com/gdx1231/ffmpeg-utils.git</connection>
+	</scm>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
-	<repositories>
-		<repository>
-			<id>public</id>
-			<name>public</name>
-			<url>https://maven.aliyun.com/repository/public</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
-	<pluginRepositories>
-		<pluginRepository>
-			<id>gradle</id>
-			<name>gradle</name>
-			<url>https://maven.aliyun.com/repository/gradle-plugin</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</pluginRepository>
-	</pluginRepositories>
+	<dependencies>
+		<dependency>
+			<groupId>net.bramp.ffmpeg</groupId>
+			<artifactId>ffmpeg</artifactId>
+			<version>0.6.2</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-log4j12 -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.7.26</version>
+		</dependency>
+	</dependencies>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
 		<plugins>
@@ -69,26 +73,95 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<!-- <version>3.2.0</version> -->
+						<!-- Maven在Java8下忽略Javadoc的编译错误 https://liumapp.gitee.io/articles/2018/08/22/1534905949519.html/ -->
+						<version>2.10.3</version>
+						<executions>
+							<execution>
+								<phase>package</phase>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+								<configuration>
+									<additionalparam>-Xdoclint:none</additionalparam>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
 		</plugins>
 	</build>
 
-	<dependencies>
-		<dependency>
-			<groupId>net.bramp.ffmpeg</groupId>
-			<artifactId>ffmpeg</artifactId>
-			<version>0.6.2</version>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-log4j12 -->
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-			<version>1.7.26</version>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.json/json -->
-		<!-- <dependency>
-		    <groupId>org.json</groupId>
-		    <artifactId>json</artifactId>
-		    <version>20201115</version>
-		</dependency>-->
-	</dependencies>
+	<!-- 发布项目 -->
+   <!-- mvn clean deploy -P release -->
+	<profiles>
+		<profile>
+			<id>release</id> <!-- 部署要用到 -->
+			<build>
+				<plugins>
+					<!-- Source -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-source-plugin</artifactId>
+						<version>3.2.1</version>
+						<executions>
+							<execution>
+								<phase>package</phase>
+								<goals>
+									<goal>jar-no-fork</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<!-- Javadoc -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<!-- <version>3.2.0</version> -->
+						<!-- Maven在Java8下忽略Javadoc的编译错误 https://liumapp.gitee.io/articles/2018/08/22/1534905949519.html/ -->
+						<version>2.10.3</version>
+						<executions>
+							<execution>
+								<phase>package</phase>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+								<configuration>
+									<additionalparam>-Xdoclint:none</additionalparam>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<!-- GPG -->
+					<plugin> <!-- 进行延签 -->
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>1.6</version>
+						<executions>
+							<execution>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+			<distributionManagement>
+				<snapshotRepository>
+					<id>oss</id>
+					<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+				</snapshotRepository>
+				<repository>
+					<id>oss</id>
+					<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+				</repository>
+			</distributionManagement>
+		</profile>
+	</profiles>
+
+
 </project>

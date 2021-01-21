@@ -21,7 +21,13 @@ import net.bramp.ffmpeg.probe.FFmpegStream;
 import net.bramp.ffmpeg.probe.FFmpegStream.CodecType;
 import net.bramp.ffmpeg.progress.ProgressListener;
 
-public class VideoConvert   {
+/**
+ * 视频转换类
+ * 
+ * @author admin
+ *
+ */
+public class VideoConvert {
 	static final Logger LOG = LoggerFactory.getLogger(VideoConvert.class);
 
 	public final static long BIT_RATE_500K = 500 * 1024L;
@@ -79,8 +85,8 @@ public class VideoConvert   {
 	/**
 	 * 执行 Ffmpeg命令
 	 * 
-	 * @param cmd
-	 * @param listener
+	 * @param cmd      执行命令体
+	 * @param listener 监听
 	 */
 	public void exec(Command cmd, ProgressListener listener) {
 		this.exec(cmd.getBuilder(), listener);
@@ -89,10 +95,10 @@ public class VideoConvert   {
 	/**
 	 * 转换视频
 	 * 
-	 * @param sourceVideoFile
-	 * @param outputVideoFile
-	 * @param bitRate
-	 * @param outVideoScale
+	 * @param sourceVideoFile 源视频文件
+	 * @param outputVideoFile 输出视频文件
+	 * @param bitRate         码率
+	 * @param outVideoScale   输出视频分辨率
 	 */
 	public ConvertResult convertTo(File sourceVideoFile, File outputVideoFile, long bitRate, VideoScale outVideoScale) {
 		return this.convertTo(sourceVideoFile.getAbsolutePath(), outputVideoFile.getAbsolutePath(), bitRate,
@@ -102,10 +108,10 @@ public class VideoConvert   {
 	/**
 	 * 转换视频
 	 * 
-	 * @param sourceVideo
-	 * @param outputVideo
-	 * @param bitRate
-	 * @param outVideoScale
+	 * @param sourceVideo   源视频文件地址
+	 * @param outputVideo   输出视频文件地址
+	 * @param bitRate       码率
+	 * @param outVideoScale 输出视频分辨率
 	 */
 	public ConvertResult convertTo(String sourceVideo, String outputVideo, long bitRate, VideoScale outVideoScale) {
 		String videoCodec = this.videoDecoder;
@@ -141,9 +147,9 @@ public class VideoConvert   {
 	/**
 	 * 转成 ts文件
 	 * 
-	 * @param souceVideo
-	 * @param outTs
-	 * @return
+	 * @param souceVideo 源视频文件地址
+	 * @param outTs      输出视频文件地址(ts)
+	 * @return 转换结果
 	 */
 	public ConvertResult convertToTs(String souceVideo, String outTs) {
 		return this.convertToTs(new File(souceVideo), new File(outTs));
@@ -152,9 +158,9 @@ public class VideoConvert   {
 	/**
 	 * 转成 ts文件
 	 * 
-	 * @param souceVideo
-	 * @param outTs
-	 * @return
+	 * @param souceVideo 源视频文件
+	 * @param outTs      输出视频文件
+	 * @return 转换结果
 	 */
 	public ConvertResult convertToTs(File souceVideo, File outTs) {
 		Command cmdts = Commands.createCovert2TsCommand(souceVideo, outTs);
@@ -184,7 +190,7 @@ public class VideoConvert   {
 	 *                      /videos/vod_1010，会创建为/videos/vod_1010.m3u8索引文件和
 	 *                      /videos/vod_1010-0000000000.ts，/videos/vod_1010-0000000001.ts等分片文件
 	 * @param segmentTime   分片时间
-	 * @return
+	 * @return 转换结果
 	 */
 	public ConvertResult convertToM3u8(File sourceTsVideo, String outFilePrefix, int segmentTime) {
 
@@ -217,7 +223,7 @@ public class VideoConvert   {
 	 * 根据 M3u8 索引文件，获取分片文件列表
 	 * 
 	 * @param m3u8IndexFile 分片文件索引文件地址，例如 /videos/vod_1011.mu38
-	 * @return
+	 * @return 视频信息
 	 */
 	public VideoInfo queryM3u8Info(String m3u8IndexFile) {
 		return this.queryM3u8Info(new File(m3u8IndexFile));
@@ -227,7 +233,7 @@ public class VideoConvert   {
 	 * 根据 M3u8 索引文件，获取分片文件列表
 	 * 
 	 * @param m3u8IndexFile 分片文件索引文件，例如 /videos/vod_1011.mu38
-	 * @return
+	 * @return 视频信息
 	 */
 	public VideoInfo queryM3u8Info(File m3u8IndexFile) {
 		VideoInfo m3u8Info = new VideoInfo();
@@ -260,7 +266,7 @@ public class VideoConvert   {
 	 * 获取视频基础信息
 	 * 
 	 * @param videoFile 视频文件
-	 * @return
+	 * @return 视频信息
 	 */
 	public VideoInfo queryVodInfo(File videoFile) {
 		String videoPath = videoFile.getAbsolutePath();
@@ -308,13 +314,15 @@ public class VideoConvert   {
 	 * 获取视频基础信息
 	 * 
 	 * @param videoPath 视频的目录和文件名
-	 * @return
+	 * @return 视频信息
 	 */
 	public VideoInfo queryVodInfo(String videoPath) {
 		return this.queryVodInfo(new File(videoPath));
 	}
 
 	/**
+	 * 获取硬件加速
+	 * 
 	 * @return the hwAccel
 	 */
 	public String getHwAccel() {
@@ -322,6 +330,8 @@ public class VideoConvert   {
 	}
 
 	/**
+	 * 设置硬件加速
+	 * 
 	 * @param hwAccel the hwAccel to set
 	 */
 	public void setHwAccel(String hwAccel) {
@@ -329,32 +339,44 @@ public class VideoConvert   {
 	}
 
 	/**
-	 * @return the codec
+	 * 获取视频编码
+	 * 
+	 * @return the videoEncoder
 	 */
 	public String getVideoEncoder() {
 		return videoEncoder;
 	}
 
 	/**
-	 * @param codec the codec to set
+	 * 设置视频编码
+	 * 
+	 * @param videoEncoder the videoEncoder to set
 	 */
 	public void setVideoEncodeCodec(String videoEncoder) {
 		this.videoEncoder = videoEncoder;
 	}
 
 	/**
+	 * 设置水印
+	 * 
 	 * @param watermark the watermark to set
 	 */
 	public void setWatermark(Watermark watermark) {
 		this.watermark = watermark;
 	}
 
+	/**
+	 * 获取水印
+	 * 
+	 * @return the watermark
+	 */
 	private Watermark getWatermark() {
 
 		return this.watermark;
 	}
 
 	/**
+	 * 获取视频解码器
 	 * 
 	 * @return the videoDecoder
 	 */
@@ -363,6 +385,8 @@ public class VideoConvert   {
 	}
 
 	/**
+	 * 设置视频解码器
+	 * 
 	 * @param videoDecoder the videoDecoder to set
 	 */
 	public void setVideoDecoder(String videoDecoder) {

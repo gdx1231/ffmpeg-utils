@@ -9,6 +9,12 @@ import org.slf4j.LoggerFactory;
 import net.bramp.ffmpeg.builder.FFmpegBuilder;
 import net.bramp.ffmpeg.builder.FFmpegOutputBuilder;
 
+/**
+ * 创建命令体的静态类，同时提供在 ffmpeg-utils.properties定义的系统参数
+ * 
+ * @author admin
+ *
+ */
 public class Commands {
 
 	/**
@@ -69,7 +75,7 @@ public class Commands {
 	 * @param sourceFile    来源文件
 	 * @param m3u8IndexName m3u8索引文件 (含输出目录）
 	 * @param segmentPrefix 分片文件前缀 (含输出目录）
-	 * @return
+	 * @return 执行Ffmpeg的命令体
 	 */
 	public static Command createM3u8Command(String sourceFile, String m3u8IndexName, String segmentPrefix) {
 		return createM3u8Command(sourceFile, m3u8IndexName, segmentPrefix, 5);
@@ -82,7 +88,7 @@ public class Commands {
 	 * @param m3u8IndexName m3u8索引文件 (含输出目录）
 	 * @param segmentPrefix 分片文件前缀 (含输出目录）
 	 * @param segmentTime   分割的时间（秒）
-	 * @return
+	 * @return 执行Ffmpeg的命令体
 	 */
 	public static Command createM3u8Command(String sourceFile, String m3u8IndexName, String segmentPrefix,
 			int segmentTime) {
@@ -109,7 +115,7 @@ public class Commands {
 	 * 
 	 * @param sourceFile 视频源文件
 	 * @param tsFile     输出ts视频文件
-	 * @return
+	 * @return 执行Ffmpeg的命令体
 	 */
 	public static Command createCovert2TsCommand(File sourceFile, File tsFile) {
 		return createCovert2TsCommand(sourceFile.getAbsolutePath(), tsFile.getAbsolutePath());
@@ -120,7 +126,7 @@ public class Commands {
 	 * 
 	 * @param sourceFileName 视频源，文件目录及文件名
 	 * @param tsFileName     输出ts视频，文件目录及文件名
-	 * @return
+	 * @return 执行Ffmpeg的命令体
 	 */
 	public static Command createCovert2TsCommand(String sourceFileName, String tsFileName) {
 		FFmpegBuilder builder1 = new FFmpegBuilder();
@@ -139,14 +145,14 @@ public class Commands {
 	}
 
 	/**
-	 * 
+	 * 转换成mp4文件
 	 * @param sourceFile    原始文件
 	 * @param outFile       输出文件
 	 * @param codec         编码
 	 * @param videoBitRate  视频比特率 ，例如 2 * 1024 * 1024 /2k
 	 * @param outVideoScale 输出视频比例，400:-1, 1024:-1 ...
 	 * @param waterMark     在视频上添加的水印
-	 * @return
+	 * @return 执行Ffmpeg的命令体
 	 */
 	public static Command createConvert2Mp4(String sourceFile, String outFile, String codec, long videoBitRate,
 			VideoScale outVideoScale, Watermark waterMark) {
@@ -168,12 +174,11 @@ public class Commands {
 		// .setStrict(FFmpegBuilder.Strict.EXPERIMENTAL) // Allow FFmpeg to use
 		// experimental specs
 		out1.setVideoBitRate(videoBitRate);
-		
-		//避免错误 Too many packets buffered for output stream 0:1
-		out1.addExtraArgs("-max_muxing_queue_size", "9999");
-		
-		out1.done();
 
+		// 避免错误 Too many packets buffered for output stream 0:1
+		out1.addExtraArgs("-max_muxing_queue_size", "9999");
+
+		out1.done();
 
 		if (waterMark != null) {
 			waterMark.setVideoScale(outVideoScale);

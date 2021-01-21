@@ -4,7 +4,7 @@ import com.gdxsoft.ffmpegUtils.VideoScale;
 import com.gdxsoft.ffmpegUtils.Watermark;
 
 /**
- * 工作信息
+ * 用于boss和work传递的任务信息
  * 
  * @author admin
  *
@@ -124,7 +124,7 @@ public class TaskBasic {
 	/**
 	 * 是否转码为 MPEG-TS 格式，默认true
 	 * 
-	 * @param covvertToTs the covvertToTs to set
+	 * @param convertToTs the covvertToTs to set
 	 */
 	public void setConvertToTs(boolean convertToTs) {
 		this.convertToTs = convertToTs;

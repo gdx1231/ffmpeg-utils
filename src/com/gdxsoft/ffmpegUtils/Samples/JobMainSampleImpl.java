@@ -9,6 +9,9 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.gdxsoft.ffmpegUtils.VideoConvert;
 import com.gdxsoft.ffmpegUtils.VideoScale;
 import com.gdxsoft.ffmpegUtils.Watermark;
@@ -16,9 +19,19 @@ import com.gdxsoft.ffmpegUtils.job.IJobMain;
 import com.gdxsoft.ffmpegUtils.job.ITaskInfo;
 import com.gdxsoft.ffmpegUtils.job.JobWorker;
 
+/**
+ * 一个简单的任务分配的主程序boss<br>
+ * 1 扫描视频所在源目录下的所有视频加载到任务队列中<br>
+ * 2 启动多线程的worker工作队列<br>
+ * 3 worker 通过 主程序boss的 getTask 获取任务并执行<br>
+ * 
+ * @author admin
+ *
+ */
 public class JobMainSampleImpl implements IJobMain {
+	static final Logger LOG = LoggerFactory.getLogger(JobMainSampleImpl.class);
 
-	private List<ITaskInfo> taskList;
+	private List<ITaskInfo> taskList; // 任务队列
 	private List<JobWorker> queues;
 	private List<Future<String>> futures;
 	private ThreadPoolExecutor executor;
@@ -27,10 +40,14 @@ public class JobMainSampleImpl implements IJobMain {
 	private String outputPath;
 	private String logoPath;
 
+	public JobMainSampleImpl() {
+		LOG.info("I'm boss");
+	}
+
 	/**
-	 * 获取一个工作信息
+	 * 获取一个work使用的任务信息
 	 * 
-	 * @return
+	 * @return 任务信息
 	 */
 	public synchronized ITaskInfo getTask() {
 		if (taskList == null) { // 没有初始化数据了
@@ -79,24 +96,41 @@ public class JobMainSampleImpl implements IJobMain {
 		Watermark waterMark = this.createWatermark();
 		for (int i = 0; i < files.length; i++) {
 			File file = files[i];
-			if (file.isDirectory() || file.length() == 0) {
-				continue;
-			}
-			String name = file.getName().toUpperCase();
-			if (name.endsWith(".MP4") || name.endsWith(".MOV") || name.endsWith(".MTK") || name.endsWith(".AVI")
-					|| name.endsWith(".WVM")) {
-				TaskSampleImpl task = new TaskSampleImpl();
-				task.setSourceVideo(file.getAbsolutePath());
-				String outPrefix = outDir.getAbsolutePath() + File.separator + file.getName() + "-output"
-						+ File.separator + "720P";
-				task.setOutPrefix(outPrefix);
-				task.setBitRate(bitRateOf720p);
-				task.setWaterMark(waterMark);
-				task.setOutVideoScale(p720);
-
-				taskList.add(task);
-			}
+			this.addTask(file, outDir, p720, bitRateOf720p, waterMark);
 		}
+	}
+
+	/**
+	 * 添加到任务队列里
+	 * 
+	 * @param file       文件
+	 * @param outDir     输出目录
+	 * @param videoScale 分辨率
+	 * @param bitRate    码率
+	 * @param waterMark  水印
+	 */
+	private void addTask(File file, File outDir, VideoScale videoScale, long bitRate, Watermark waterMark) {
+		if (file.isDirectory() || file.length() == 0) {
+			return;
+		}
+		String name = file.getName().toUpperCase();
+		if (!(name.endsWith(".MP4") || name.endsWith(".MOV") || name.endsWith(".MTK") || name.endsWith(".AVI")
+				|| name.endsWith(".WVM"))) {
+			return;
+		}
+
+		TaskSampleImpl task = new TaskSampleImpl();
+		task.setSourceVideo(file.getAbsolutePath());
+		task.setBitRate(bitRate);
+		task.setWaterMark(waterMark);
+		task.setOutVideoScale(videoScale);
+
+		// 输出视频文件目录的前缀
+		String outPrefix = outDir.getAbsolutePath() + File.separator + file.getName() + "-output" + File.separator
+				+ "720P";
+		task.setOutPrefix(outPrefix);
+
+		taskList.add(task);
 	}
 
 	public Watermark createWatermark() {
@@ -114,6 +148,11 @@ public class JobMainSampleImpl implements IJobMain {
 		return wm;
 	}
 
+	/**
+	 * 根据 queueLength 初始化worker队列
+	 * 
+	 * @param queueLength 队列长度
+	 */
 	public void initQueue(int queueLength) {
 		queues = new LinkedList<>();
 		futures = new LinkedList<>();
@@ -135,25 +174,23 @@ public class JobMainSampleImpl implements IJobMain {
 		boss.setLogoPath("d:/test/logo.png"); // logo的路径
 		boss.setSourcePath("d:/test/source"); // 源视频所在目录
 		boss.setOutputPath("d:/test/output"); // 视频输出目录
-		
-		
+
 		boss.queryMoreTasks();
 
-		// 根据计算机和显卡的能力，创建5个队列
+		// 根据计算机和显卡的能力，创建2个队列
+		boss.initQueue(2);
+
 		// windows 破解 nvdia 转码并发超过两个， OpenEncodeSessionEx failed: out of memory (10)
 		// http://www.smartplatform.top/index.php/archives/84/
-		// 特征码:84 C0 74 08 C6 43 38 01 33 C0 
-		// 修改为:84 C0 90 90 C6 43 38 01 33 C0 
-		// 在linux下
+		// 特征码:84 C0 74 08 C6 43 38 01 33 C0
+		// 修改为:84 C0 90 90 C6 43 38 01 33 C0
 		// sed
 		// 's/\x84\xC0\x74\x08\xC6\x43\x38\x01\x33\xC0/\x84\xC0\x90\x90\xC6\x43\x38\x01\x33\xC0/g'
 		// nvcuvid.dll > nvcuvid-1.dll
-		boss.initQueue(2);
 
 		boss.executor.shutdown();
 	}
-	
-	
+
 	/**
 	 * @return the sourcePath
 	 */
