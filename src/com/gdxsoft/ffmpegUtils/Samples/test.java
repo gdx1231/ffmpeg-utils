@@ -6,6 +6,7 @@ import com.gdxsoft.ffmpegUtils.job.JobWorker;
 
 public class test {
 	public static void main(String[] args) throws Exception {
+
 		String sourceFile = "d:/360Rec/test.mp4";
 		String outFilePrefix = "d:/360Rec/test.mp4.output/720P";
 

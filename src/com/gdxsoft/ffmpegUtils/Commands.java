@@ -1,7 +1,6 @@
 package com.gdxsoft.ffmpegUtils;
 
 import java.io.File;
-import java.io.InputStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,34 +37,50 @@ public class Commands {
 	static {
 		String propName = "ffmpeg-utils.properties";
 		java.util.Properties props = new java.util.Properties();
-		InputStream in = null;
-		try {
-			in = Commands.class.getClassLoader().getResourceAsStream(propName);
-			props.load(in);
-			if (props.getProperty("PATH_FFMPEG") != null) {
-				PATH_FFMPEG = props.getProperty("PATH_FFMPEG").trim();
-			}
-			if (props.getProperty("PATH_FFPROBE") != null) {
-				PATH_FFPROBE = props.getProperty("PATH_FFPROBE").trim();
-			}
-			if (props.getProperty("HWACCEL") != null) {
-				HWACCEL = props.getProperty("HWACCEL").trim();
-			}
-			if (props.getProperty("HW_H264_ENC") != null) {
-				HW_H264_ENC = props.getProperty("HW_H264_ENC").trim();
-			}
 
-		} catch (Exception e) {
-			LOG.error(e.getMessage());
-		} finally {
-			if (in != null) {
-				try {
-					in.close();
-				} catch (Exception e) {
-					LOG.error(e.getMessage());
+		String path;
+		if (Commands.class.getClassLoader().getResource("/") == null) {
+			// console call
+			path = Commands.class.getClassLoader().getResource(".").getPath();
+		} else {
+			// tomcat call
+			path = Commands.class.getClassLoader().getResource("/").getPath();
+		}
+		File propFile = new File( path+File.separator+propName);
+		if(!propFile.exists()) {
+			LOG.error(propFile + " not exists");
+		} else {
+			java.io.FileInputStream fi = null;
+			try {
+				fi = new java.io.FileInputStream(propFile);
+				props.load(fi);
+				if (props.getProperty("PATH_FFMPEG") != null) {
+					PATH_FFMPEG = props.getProperty("PATH_FFMPEG").trim();
+				}
+				if (props.getProperty("PATH_FFPROBE") != null) {
+					PATH_FFPROBE = props.getProperty("PATH_FFPROBE").trim();
+				}
+				if (props.getProperty("HWACCEL") != null) {
+					HWACCEL = props.getProperty("HWACCEL").trim();
+				}
+				if (props.getProperty("HW_H264_ENC") != null) {
+					HW_H264_ENC = props.getProperty("HW_H264_ENC").trim();
+				}
+
+			} catch (Exception e) {
+				LOG.error(e.getMessage());
+			} finally {
+				if (fi != null) {
+					try {
+						fi.close();
+					} catch (Exception e) {
+						LOG.error(e.getMessage());
+					}
 				}
 			}
 		}
+		
+		
 
 	}
 
