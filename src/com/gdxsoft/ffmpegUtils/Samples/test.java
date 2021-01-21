@@ -1,4 +1,4 @@
-package com.gdxsoft.ffmpegUtils.Test;
+package com.gdxsoft.ffmpegUtils.Samples;
 
 import java.io.File;
 
@@ -6,6 +6,7 @@ import com.gdxsoft.ffmpegUtils.*;
 
 public class test {
 	public static void main(String[] args) {
+		
 		long t0 = System.currentTimeMillis();
 
 		VideoConvert vc = new VideoConvert();

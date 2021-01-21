@@ -1,4 +1,4 @@
-package com.gdxsoft.ffmpegUtils.Test;
+package com.gdxsoft.ffmpegUtils.Samples;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

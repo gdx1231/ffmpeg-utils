@@ -1,4 +1,4 @@
-package com.gdxsoft.ffmpegUtils.Test;
+package com.gdxsoft.ffmpegUtils.Samples;
 
 import java.io.File;
 import java.util.ArrayList;
