@@ -4,6 +4,21 @@
 
 ## 示例方法是 com.gdxsoft.ffmpegUtils.Samples.JobMainSampleImpl 
 
+## maven
+```
+<dependency>
+  <groupId>com.gdxsoft.ffmpeg</groupId>
+  <artifactId>ffmpeg-utils</artifactId>
+  <version>1.0.0</version>
+</dependency>
+```
+
+## Gradle 
+```
+implementation 'com.gdxsoft.ffmpeg:ffmpeg-utils:1.0.0'
+```
+
+
 
 #####  破解windows 下 nvdia 转码并发超过两个， OpenEncodeSessionEx failed: out of memory (10)
 

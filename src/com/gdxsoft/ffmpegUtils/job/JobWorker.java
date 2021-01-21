@@ -45,7 +45,7 @@ public class JobWorker implements Callable<String> {
 	public VideoConvert initDefaultVc() {
 		VideoConvert vc = new VideoConvert();
 		vc.setHwAccel(Commands.HWACCEL);
-		vc.setVideoEncodeCodec(Commands.HW_H264_ENC);
+		vc.setVideoEncoder(Commands.HW_H264_ENC);
 
 		this.vodCovert = vc;
 		return vc;
@@ -141,6 +141,16 @@ public class JobWorker implements Callable<String> {
 		}
 
 		File outMp4 = new File(rstMp4.getOutputInfo().getVideoPath());
+
+		try {
+			ConvertResult rstCover = this.converToCoverImage(outMp4);
+			jobResult.addResult("cover", rstCover);
+			args[2] = rstCover;
+			taskInfo.onStep(this, "cover", args);
+		} catch (Exception err) {
+			taskInfo.onError(this, err, args);
+			throw new Exception("提取封面出错，" + err.getLocalizedMessage());
+		}
 		ConvertResult rstTs = null;
 		if (this.taskInfo.isConvertToTs()) {
 			// 转成 ts文件
@@ -178,6 +188,22 @@ public class JobWorker implements Callable<String> {
 
 		taskInfo.onCompleted(this, args);
 		return jobResult;
+	}
+
+	/**
+	 * 获取一张视频的封面（关键帧）
+	 * 
+	 * @param sourceVideo 来源视频
+	 * @return 提取结果
+	 */
+	public ConvertResult converToCoverImage(File sourceVideo) {
+		File coverImage = new File(this.taskInfo.getOutPrefix() + ".cover.jpg");
+		LOG.info("get cover  from " + sourceVideo + " to " + coverImage);
+
+		ConvertResult result = this.vodCovert.converToCoverImage(sourceVideo, coverImage);
+		LOG.info("get cover done " + result.execTimeMilliSeconds() / 1000.0);
+
+		return result;
 	}
 
 	/**

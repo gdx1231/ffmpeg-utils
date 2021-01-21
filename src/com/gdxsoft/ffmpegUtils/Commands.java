@@ -70,6 +70,66 @@ public class Commands {
 	}
 
 	/**
+	 * 创建 获取视频的一张封面图（关键帧）命令
+	 * 
+	 * @param sourceFile     来源视频文件
+	 * @param coverImagePath 创建图片文件
+	 * @return 执行Ffmpeg的命令体
+	 */
+	public static Command createGetCoverCommand(File sourceFile, File coverImagePath) {
+		return createGetCoverCommand(sourceFile.getAbsolutePath(), coverImagePath.getAbsolutePath());
+	}
+
+	/**
+	 * 创建 获取视频的一张封面图（关键帧）命令
+	 * 
+	 * @param sourceFile     来源视频文件路径
+	 * @param coverImagePath 创建图片路径
+	 * @return 执行Ffmpeg的命令体
+	 */
+	public static Command createGetCoverCommand(String sourceFile, String coverImagePath) {
+		// ffmpeg -i test.mp4 -vf "select=eq(pict_type\,I)" -frames:v 1 -pix_fmt
+		// yuvj422p -vsync vfr -qscale:v 2 -f image2 4.jpg -y
+		FFmpegBuilder builder3 = new FFmpegBuilder();
+		builder3.addInput(sourceFile);
+
+		FFmpegOutputBuilder out3 = builder3.addOutput(coverImagePath);
+		out3.setFormat("image2");
+		// 抽取关键帧
+		out3.setVideoFilter("\"select=eq(pict_type\\,I)\"");
+		// 一张图
+		out3.setFrames(1);
+		out3.setVideoPixelFormat("yuvj422p");
+
+		// -vsync parameter
+		// 0, passthrough 每一帧从解码器到编码器，时间戳保持不变
+		// 1, cfr 如果指定了输出帧率，输入帧会按照需要进行复制（如果输出帧率大于输入帧率）或丢弃（如果输出帧率小于输入帧率）
+		// 2, vfr 输入帧从解码器到编码器，时间戳保持不变；如果出现相同时间戳的帧，则丢弃之
+		// drop 同 passthrough，但将所有帧的时间戳清空
+		// -1, auto Chooses between 1 and 2 depending on muxer capabilities. This is the
+		// default method.
+
+		// Variable Bit Rate with -qscale
+
+		// You can select a video quality level with -qscale:v n (or the alias -q:v n),
+		// where n is a number from 1-31, with 1 being highest quality/largest filesize
+		// and 31 being the lowest quality/smallest filesize. This is a variable bit
+		// rate mode, roughly analogous to using -qp (constant QP [quantization
+		// parameter]) with x264. Most of the time this should be the preferred method.
+
+		// You can select an audio quality level with -qscale:a (or the alias -q:a). The
+		// value changes depending on the audio encoder. Since this guide uses
+		// libmp3lame see the MP3 Encoding Guide for examples and more information.
+		out3.addExtraArgs("-vsync", "vfr", "-qscale:v", "2");
+
+		Command cmd = new Command();
+		cmd.addOutputBuilder(out3);
+		cmd.setBuilder(builder3);
+
+		return cmd;
+	}
+
+	/**
 	 * 创建 转码m3u8 视频格式文件，按照每5秒分割一个
 	 * 
 	 * @param sourceFile    来源文件
@@ -146,6 +206,24 @@ public class Commands {
 
 	/**
 	 * 转换成mp4文件
+	 * 
+	 * @param sourceFile    原始文件
+	 * @param outFile       输出文件
+	 * @param codec         编码
+	 * @param videoBitRate  视频比特率 ，例如 2 * 1024 * 1024 /2k
+	 * @param outVideoScale 输出视频比例，400:-1, 1024:-1 ...
+	 * @param waterMark     在视频上添加的水印
+	 * @return 执行Ffmpeg的命令体
+	 */
+	public static Command createConvert2Mp4(File sourceFile, File outFile, String codec, long videoBitRate,
+			VideoScale outVideoScale, Watermark waterMark) {
+		return createConvert2Mp4(sourceFile.getAbsolutePath(), outFile.getAbsolutePath(), codec, videoBitRate,
+				outVideoScale, waterMark);
+	}
+
+	/**
+	 * 转换成mp4文件
+	 * 
 	 * @param sourceFile    原始文件
 	 * @param outFile       输出文件
 	 * @param codec         编码
@@ -166,7 +244,7 @@ public class Commands {
 
 		FFmpegOutputBuilder out1 = builder.addOutput(outFile);
 		// Filename for the destination
-		// .setFormat("mp4") // Format is inferred from filename, or can be set
+		out1.setFormat("mp4"); // Format is inferred from filename, or can be set
 		out1.disableSubtitle(); // No subtiles
 		out1.setVideoCodec(codec); // Video using x264
 		// .setVideoFrameRate(24, 1) // at 24 frames per second

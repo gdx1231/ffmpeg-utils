@@ -93,6 +93,46 @@ public class VideoConvert {
 	}
 
 	/**
+	 * 提取一张视频的封面（关键帧）
+	 * 
+	 * @param sourceVideo 来源视频
+	 * @param coverImage  创建的图片
+	 * @return 提取结果
+	 */
+	public ConvertResult converToCoverImage(File sourceVideo, File coverImage) {
+		Command cmdts = Commands.createGetCoverCommand(sourceVideo, coverImage);
+
+		ConvertResult rst = new ConvertResult();
+		List<String> args = cmdts.getBuilder().build();
+		rst.setArgs(args);
+
+		this.exec(cmdts, null);
+
+		rst.setEndTime(System.currentTimeMillis());
+
+		VideoInfo sourceVi = this.queryVodInfo(sourceVideo);
+		rst.setSourceInfo(sourceVi);
+
+		VideoInfo coverInfo = new VideoInfo();
+		coverInfo.setVideoPath(coverImage.getAbsolutePath());
+		rst.setOutputInfo(coverInfo);
+
+		return rst;
+
+	}
+
+	/**
+	 * 提取一张视频的封面（关键帧）
+	 * 
+	 * @param sourceVideo 来源视频
+	 * @param coverImage  创建的图片
+	 * @return 提取结果
+	 */
+	public ConvertResult converToCoverImage(String sourceVideo, String coverImage) {
+		return this.converToCoverImage(new File(sourceVideo), new File(coverImage));
+	}
+
+	/**
 	 * 转换视频
 	 * 
 	 * @param sourceVideoFile 源视频文件
@@ -101,26 +141,16 @@ public class VideoConvert {
 	 * @param outVideoScale   输出视频分辨率
 	 */
 	public ConvertResult convertTo(File sourceVideoFile, File outputVideoFile, long bitRate, VideoScale outVideoScale) {
-		return this.convertTo(sourceVideoFile.getAbsolutePath(), outputVideoFile.getAbsolutePath(), bitRate,
-				outVideoScale);
-	}
+		// 创建输出视频所在目录
+		outputVideoFile.getParentFile().mkdirs();
 
-	/**
-	 * 转换视频
-	 * 
-	 * @param sourceVideo   源视频文件地址
-	 * @param outputVideo   输出视频文件地址
-	 * @param bitRate       码率
-	 * @param outVideoScale 输出视频分辨率
-	 */
-	public ConvertResult convertTo(String sourceVideo, String outputVideo, long bitRate, VideoScale outVideoScale) {
-		String videoCodec = this.videoDecoder;
+		String encoder = this.videoEncoder;
 
-		if (videoCodec == null || videoCodec.trim().length() == 0) {
-			videoCodec = "libx264rgb";
+		if (encoder == null || encoder.trim().length() == 0) {
+			encoder = "libx264rgb";
 		}
 
-		Command cmd = Commands.createConvert2Mp4(sourceVideo, outputVideo, this.videoEncoder, bitRate, outVideoScale,
+		Command cmd = Commands.createConvert2Mp4(sourceVideoFile, outputVideoFile, encoder, bitRate, outVideoScale,
 				getWatermark());
 
 		if (this.hwAccel != null && this.hwAccel.trim().length() > 0) {
@@ -135,35 +165,50 @@ public class VideoConvert {
 
 		rst.setEndTime(System.currentTimeMillis());
 
-		VideoInfo sourceVi = this.queryVodInfo(sourceVideo);
-		VideoInfo outputVi = this.queryVodInfo(outputVideo);
+		VideoInfo sourceInfo = this.queryVodInfo(sourceVideoFile);
+		rst.setSourceInfo(sourceInfo);
 
-		rst.setOutputInfo(outputVi);
-		rst.setSourceInfo(sourceVi);
+		VideoInfo outputInfo = this.queryVodInfo(outputVideoFile);
+		rst.setOutputInfo(outputInfo);
 
 		return rst;
+
+	}
+
+	/**
+	 * 转换视频
+	 * 
+	 * @param sourceVideo   源视频文件地址
+	 * @param outputVideo   输出视频文件地址
+	 * @param bitRate       码率
+	 * @param outVideoScale 输出视频分辨率
+	 */
+	public ConvertResult convertTo(String sourceVideo, String outputVideo, long bitRate, VideoScale outVideoScale) {
+		File of = new File(outputVideo);
+		File sf = new File(sourceVideo);
+		return this.convertTo(sf, of, bitRate, outVideoScale);
 	}
 
 	/**
 	 * 转成 ts文件
 	 * 
-	 * @param souceVideo 源视频文件地址
-	 * @param outTs      输出视频文件地址(ts)
+	 * @param sourceVideo 源视频文件地址
+	 * @param outTs       输出视频文件地址(ts)
 	 * @return 转换结果
 	 */
-	public ConvertResult convertToTs(String souceVideo, String outTs) {
-		return this.convertToTs(new File(souceVideo), new File(outTs));
+	public ConvertResult convertToTs(String sourceVideo, String outTs) {
+		return this.convertToTs(new File(sourceVideo), new File(outTs));
 	}
 
 	/**
 	 * 转成 ts文件
 	 * 
-	 * @param souceVideo 源视频文件
-	 * @param outTs      输出视频文件
+	 * @param sourceVideo 源视频文件
+	 * @param outTs       输出视频文件
 	 * @return 转换结果
 	 */
-	public ConvertResult convertToTs(File souceVideo, File outTs) {
-		Command cmdts = Commands.createCovert2TsCommand(souceVideo, outTs);
+	public ConvertResult convertToTs(File sourceVideo, File outTs) {
+		Command cmdts = Commands.createCovert2TsCommand(sourceVideo, outTs);
 
 		ConvertResult rst = new ConvertResult();
 		List<String> args = cmdts.getBuilder().build();
@@ -173,7 +218,7 @@ public class VideoConvert {
 
 		rst.setEndTime(System.currentTimeMillis());
 
-		VideoInfo sourceVi = this.queryVodInfo(souceVideo);
+		VideoInfo sourceVi = this.queryVodInfo(sourceVideo);
 		VideoInfo outputVi = this.queryVodInfo(outTs);
 
 		rst.setOutputInfo(outputVi);
@@ -352,7 +397,7 @@ public class VideoConvert {
 	 * 
 	 * @param videoEncoder the videoEncoder to set
 	 */
-	public void setVideoEncodeCodec(String videoEncoder) {
+	public void setVideoEncoder(String videoEncoder) {
 		this.videoEncoder = videoEncoder;
 	}
 
