@@ -9,13 +9,13 @@
 <dependency>
   <groupId>com.gdxsoft.ffmpeg</groupId>
   <artifactId>ffmpeg-utils</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
 </dependency>
 ```
 
 ## Gradle 
 ```
-implementation 'com.gdxsoft.ffmpeg:ffmpeg-utils:1.0.0'
+implementation 'com.gdxsoft.ffmpeg:ffmpeg-utils:1.0.1'
 ```
 
 
